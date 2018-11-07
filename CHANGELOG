@@ -1,0 +1,6 @@
+2018 Nov 08
+		Abandoning the idea of writing a custom loader 
+		Going to use GRUB and concentrate the efforts on writing a working kernel 
+
+2016 Oct 27
+		Wrote a primary loader	
