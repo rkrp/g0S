@@ -1,17 +1,26 @@
-#gOS
+gOs
+===
 
-My n-th attempt at writing a minimal operating system.
+My n-th attempt at writing a minimal x86 operating system.
 
 Nothing fancy to see here.
 
-##Build
+Build
+-----
 
-`nasm` can be used to build this.
+Just run 
 
-    nasm -f bin loader.asm -o loader.bin
+    make kern_bin iso
 
-##Run
+You should see g0s.iso in the current directory
+
+Run
+---
 
 It can be run in `qemu` by
 
-    qemu-system-i386 -net none -fda loader.bin
+    qemu-system-i386 -cdrom g0s.iso
+
+Or if you fancy running it in a real x86 hardware, write it to a pendrive by
+
+    sudo dd if=g0s.iso of=/dev/sdX && sync
