@@ -1,36 +1,35 @@
-BITS 16
+; Declare constants for the multiboot header.
+MBALIGN   equ  1 << 0            ; align loaded modules on page boundaries
+MEMINFO   equ  1 << 1            ; provide memory map
+FLAGS     equ  MBALIGN | MEMINFO ; this is the Multiboot 'flag' field
+MAGIC     equ  0x1BADB002        ; 'magic number' lets bootloader find the header
+CHECKSUM  equ -(MAGIC + FLAGS)   ; checksum of above, to prove we are multiboot
+STACKSIZE equ  (32 * 1024)
 
-start:
-    mov ax, 07C0h
-    add ax, 288
-    mov ss, ax
-    mov sp, 4096
+section .multiboot
+align 4
+    dd MAGIC
+    dd FLAGS
+    dd CHECKSUM
 
-    mov ax, 07C0h
-    mov ds, ax
+section .bss
+align 16
 
-    mov si, text_string
-    call print_string
+; Setup stack here in bss for 32 KB
+stack_bottom:
+resb STACKSIZE
+stack_top:
 
-    jmp $
+section .text
+global _start:function (_start.end - _start)
+_start:
+    mov esp, $stack_top         ; setup stack 
 
-
-    text_string db 'Welcome to gOS', 0
-
-
-print_string:
-    mov ah, 0Eh
-
-.repeat:
-    lodsb
-    cmp al, 0
-    je .done
-    int 10h
-    jmp .repeat
-    
-.done:
-    ret
-
-    times 510-($-$$) db 0
-    dw 0xAA55
+    extern kernel_main
+    call kernel_main            ; drop in to the kernel in C
+    cli
+    .hang:                      ; loop infinitely here and do nothing
+        hlt
+        jmp .hang
+    .end:
 
