@@ -1,4 +1,4 @@
-gOs
+g0s
 ===
 
 My n-th attempt at writing a minimal x86 operating system.
