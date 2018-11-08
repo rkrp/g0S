@@ -28,6 +28,6 @@ Or if you fancy running it in a real x86 hardware, write it to a pendrive by
 Todo
 ----
 
- - [ ] Add newline support in kern_puts()
+ - [X] Add newline support in kern_puts()
  - [ ] Scroll on filling the space allocated for terminal
  - [ ] Think of more stuff to add to this list. 

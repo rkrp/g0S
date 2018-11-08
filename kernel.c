@@ -56,6 +56,11 @@ void terminal_initialize() {
 
 inline void write_char_at(size_t x, size_t y, uint8_t chr, uint8_t term_color) {
     size_t index = y * VGA_WIDTH + x;
+    if(chr == '\n') {
+        term_y++;
+        term_x = 0;
+        return;
+    }
     term_buffer[index] = get_color_char(chr, term_color);
 }
 
@@ -71,5 +76,5 @@ void kern_puts(const char *str) {
 
 void kernel_main() {
     terminal_initialize();
-    kern_puts("Hello from kernel mode!");
+    kern_puts("Hello from kernel mode!\nHello again :)");
 }
