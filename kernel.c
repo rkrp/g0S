@@ -59,11 +59,18 @@ inline void write_char_at(size_t x, size_t y, uint8_t chr, uint8_t term_color) {
     size_t index = y * VGA_WIDTH + x;
 
     // Handle new line character
+    // Must go to next line even if the str exceeds the width
     if(chr == '\n') {
         term_y++;
         term_x = 0;
         return;
     }
+
+    // No-op if the string len exceeds the width of the screen 
+    // and it is not a new line char
+    if(term_x >= VGA_WIDTH)
+        return;
+    
     term_buffer[index] = get_color_char(chr, term_color);
 }
 
@@ -72,8 +79,7 @@ void kern_puts(const char *str) {
     term_color = vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_CYAN);
     
     for(uint8_t *chr = (uint8_t *) str ; *chr ; chr++) {
-        if(term_x < VGA_WIDTH)
-            write_char_at(term_x++, term_y, *chr, term_color);
+        write_char_at(term_x++, term_y, *chr, term_color);
     }
 }
 
