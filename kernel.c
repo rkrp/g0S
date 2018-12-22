@@ -10,12 +10,15 @@
 #error "This needs to be compiled with a 32 bit ix86-elf compiler"
 #endif
 
+#include "string.h"
+
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 30
 
 size_t term_x; 
 size_t term_y;
 uint16_t* term_buffer;
+
  
 /* Hardware text mode color constants. */
 enum vga_color {
@@ -74,7 +77,51 @@ void kern_puts(const char *str) {
     }
 }
 
+inline char digit_to_char(uint32_t digit) {
+    return 0x30 + digit;
+}
+
+void int_to_str(int32_t num, char *buffer) {
+    char* curr_char = buffer;
+
+    if(num == 0) {
+        kern_puts("0");
+        return;
+    }
+
+    if(num < 0) {
+        kern_strcpy(buffer, "-");
+        curr_char++;
+        num *= -1;
+    }
+
+    uint32_t num_len = 0;
+    int32_t temp_num = num;
+    while(temp_num) {
+        num_len++;
+        temp_num /= 10;
+    }
+    
+    curr_char += num_len - 1;
+    while(num) {
+        *curr_char = digit_to_char(num % 10);
+        num /= 10;
+        curr_char--;
+    }
+}
+
+void kern_print_int(int32_t num) {
+    /*
+     * 10 bytes for decimal max byte representation 
+     * +1 byte for sign and 1 byte for null byte
+     */
+    char buffer[12] = {0};
+    int_to_str(num, buffer);
+    kern_puts(buffer);
+}
+
 void kernel_main() {
     terminal_initialize();
-    kern_puts("Hello from kernel mode!\nHello again :)");
+    kern_puts("Hello from kernel mode!\nHello again :)\n");
+    kern_print_int(-123);
 }

@@ -1,11 +1,22 @@
+CC=i686-elf-gcc
+OPTS=-O2
+INCLUDES=-Iutil/includes
+CFLAGS=-std=gnu99 -ffreestanding -Wall -Wextra $(OPTS) $(INCLUDES)
+
+src="kernel.c"
+objs="kernel.o"
+
 loader:
 	nasm -felf32 loader.asm -o loader.o
 
 kernel:
-	i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) $(CFLAGS) -c -o kernel.o kernel.c
+
+utils:
+	$(CC) $(CFLAGS) -c -o util/string.o util/string.c
 
 link:
-	i686-elf-gcc -T linker.ld -o kern.bin -ffreestanding -O2 -nostdlib loader.o kernel.o -lgcc
+	$(CC) -T linker.ld -o kern.bin -ffreestanding -O2 -nostdlib loader.o kernel.o util/string.o -lgcc
 
 iso:
 	mkdir -p isodir/boot/grub/
@@ -15,6 +26,6 @@ iso:
 clean:
 	rm -r *.o *.bin *.iso  
 
-kern_bin: loader kernel link
+kern_bin: loader utils kernel link
 
 all: kern_bin iso
