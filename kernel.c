@@ -2,12 +2,10 @@
 #include <stddef.h>
 #include <stdint.h>
  
-/* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "Need a ix86 cross compiler to build this kernel"
 #endif
  
-/* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This needs to be compiled with a 32 bit ix86-elf compiler"
 #endif
@@ -56,6 +54,8 @@ void terminal_initialize() {
 
 inline void write_char_at(size_t x, size_t y, uint8_t chr, uint8_t term_color) {
     size_t index = y * VGA_WIDTH + x;
+
+    // Handle new line character
     if(chr == '\n') {
         term_y++;
         term_x = 0;
@@ -66,7 +66,7 @@ inline void write_char_at(size_t x, size_t y, uint8_t chr, uint8_t term_color) {
 
 void kern_puts(const char *str) {
     uint8_t term_color; 
-    term_color = vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_LIGHT_GREY);
+    term_color = vga_entry_color(VGA_COLOR_BLACK, VGA_COLOR_CYAN);
     
     for(uint8_t *chr = (uint8_t *) str ; *chr ; chr++) {
         if(term_x < VGA_WIDTH)

@@ -17,3 +17,4 @@ clean:
 
 kern_bin: loader kernel link
 
+all: kern_bin iso
