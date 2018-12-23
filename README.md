@@ -29,5 +29,5 @@ Todo
 ----
 
  - [X] Add newline support in kern_puts()
- - [ ] Scroll on filling the space allocated for terminal
+ - [X] Scroll on filling the space allocated for terminal
  - [ ] Think of more stuff to add to this list. 

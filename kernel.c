@@ -11,9 +11,10 @@
 #endif
 
 #include "string.h"
+#include "mem.h"
 
 #define VGA_WIDTH 80
-#define VGA_HEIGHT 30
+#define VGA_HEIGHT 25
 
 size_t term_x; 
 size_t term_y;
@@ -53,16 +54,44 @@ void terminal_initialize() {
     term_x = 0;
     term_y = 0;
     term_buffer = (uint16_t *) 0xb8000;
+    kern_memset(term_buffer, 0, VGA_HEIGHT * VGA_WIDTH * 2);
+}
+
+inline uint32_t terminal_2d_to_index(int x, int y) {
+    return y * VGA_WIDTH + x;
+}
+inline uint16_t* terminal_2d_to_addr(int x, int y) {
+    return &term_buffer[y * VGA_WIDTH + x];
+}
+
+void term_scroll_up() {
+    for(int row = 1 ; row < VGA_HEIGHT ; row++) {
+        void *src = terminal_2d_to_addr(0, row);
+        void *dest = terminal_2d_to_addr(0, row - 1);
+        kern_memcpy(dest, src, VGA_WIDTH * sizeof(*term_buffer));
+    }
+    void *last_row = terminal_2d_to_addr(0, VGA_HEIGHT - 1);
+    kern_memset(last_row, 0, VGA_WIDTH * sizeof(*term_buffer));
+    term_x = 0;
+    term_y = VGA_HEIGHT - 1;
+}
+
+inline void term_handle_newline() {
+    if(term_y + 1 >= VGA_HEIGHT) {
+        term_scroll_up();
+    } else {
+        term_y++;
+        term_x = 0;
+    }
 }
 
 inline void write_char_at(size_t x, size_t y, uint8_t chr, uint8_t term_color) {
-    size_t index = y * VGA_WIDTH + x;
+    size_t index = terminal_2d_to_index(x, y);
 
     // Handle new line character
     // Must go to next line even if the str exceeds the width
     if(chr == '\n') {
-        term_y++;
-        term_x = 0;
+        term_handle_newline();
         return;
     }
 
@@ -128,6 +157,14 @@ void kern_print_int(int32_t num) {
 
 void kernel_main() {
     terminal_initialize();
-    kern_puts("Hello from kernel mode!\nHello again :)\n");
-    kern_print_int(-123);
+    //kern_puts("Hello from kernel mode!\nHello again :)\n");
+    //kern_print_int(-123);
+    
+    int i = 1;
+    while(i <= 25) {
+        kern_print_int(i++);
+        kern_puts(": Hello World!\n");
+    }
+    kern_puts("Thats how you do it...\n");
+    kern_puts("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?\n@[\\]^_`{|}~");
 }

@@ -14,9 +14,10 @@ kernel:
 
 utils:
 	$(CC) $(CFLAGS) -c -o util/string.o util/string.c
+	$(CC) $(CFLAGS) -c -o util/mem.o util/mem.c
 
 link:
-	$(CC) -T linker.ld -o kern.bin -ffreestanding -O2 -nostdlib loader.o kernel.o util/string.o -lgcc
+	$(CC) -T linker.ld -o kern.bin -ffreestanding -O2 -nostdlib loader.o kernel.o util/string.o util/mem.o -lgcc
 
 iso:
 	mkdir -p isodir/boot/grub/
