@@ -30,4 +30,6 @@ Todo
 
  - [X] Add newline support in kern_puts()
  - [X] Scroll on filling the space allocated for terminal
- - [ ] Think of more stuff to add to this list. 
+ - [X] Add a method to print hex values.
+ - [ ] Add logging to serial port for debugging
+ - [ ] Decide on an executable format

@@ -116,6 +116,28 @@ inline char digit_to_char(uint32_t digit) {
     return 0x30 + digit;
 }
 
+inline char digit_to_hexchar(uint32_t digit) {
+    if(digit < 10)
+        return digit_to_char(digit);
+    switch(digit) {
+        case 10:
+            return 'a';
+        case 11:
+            return 'b';
+        case 12:
+            return 'c';
+        case 13:
+            return 'd';
+        case 14:
+            return 'e';
+        case 15:
+            return 'f';
+        default:
+            //Ideally this should never be returned
+            return 'T';
+    } 
+}
+
 void int_to_str(int32_t num, char *buffer) {
     char* curr_char = buffer;
 
@@ -145,6 +167,34 @@ void int_to_str(int32_t num, char *buffer) {
     }
 }
 
+/* 
+ * buffer should be at least of 10 bytes in size. 
+ * Caller should make sure of it
+ */
+
+void int32_to_hex(int32_t num, char *buffer) {
+    uint8_t shift = 0;
+    uint8_t i = 10;
+    buffer[i--] = '\x00';
+    do {
+        uint8_t byte = (num >> shift) & 0xff;
+        uint8_t low_nib = byte & 0xf;
+        uint8_t high_nib = (byte >> 4) & 0xf;
+
+        buffer[i--] = digit_to_hexchar(low_nib);
+        buffer[i--] = digit_to_hexchar(high_nib);
+        shift += 8; 
+    } while (i != 1);
+    buffer[i--] = 'x';
+    buffer[i--] = '0';
+}
+
+void kern_print_hex(int32_t num) {
+    char buffer[11] = {0};
+    int32_to_hex(num, buffer);
+    kern_puts(buffer);
+}
+
 void kern_print_int(int32_t num) {
     /*
      * 10 bytes for decimal max byte representation 
@@ -153,6 +203,11 @@ void kern_print_int(int32_t num) {
     char buffer[12] = {0};
     int_to_str(num, buffer);
     kern_puts(buffer);
+}
+
+inline void kern_println(char *buffer) {
+    kern_puts(buffer);
+    kern_puts("\n");
 }
 
 void kernel_main() {
@@ -166,5 +221,7 @@ void kernel_main() {
         kern_puts(": Hello World!\n");
     }
     kern_puts("Thats how you do it...\n");
-    kern_puts("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?\n@[\\]^_`{|}~");
+    kern_println("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?\n@[\\]^_`{|}~");
+    kern_puts("Let's try printing to hex now: ");
+    kern_print_hex((int32_t) &kernel_main);
 }
