@@ -34,3 +34,4 @@ Todo
  - [ ] Add logging to serial port for debugging
  - [ ] Decide on an executable format
  - [ ] Implement a dynamic memory allocator
+ - [ ] Implement Paging
